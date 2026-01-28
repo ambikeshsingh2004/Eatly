@@ -1,4 +1,4 @@
-const { geminiFlashVision, geminiFlash } = require('../config/gemini');
+const { genAI, MODEL_NAME } = require('../config/gemini');
 
 /**
  * Gemini AI Service
@@ -31,20 +31,27 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 If no food items are detected, return: {"ingredients": [], "totalItems": 0}`;
 
   try {
-    const result = await geminiFlashVision.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType,
-          data: imageBase64
+    const response = await genAI.models.generateContent({
+      model: MODEL_NAME,
+      contents: [
+        {
+          parts: [
+            { text: prompt },
+            {
+              inlineData: {
+                mimeType,
+                data: imageBase64
+              }
+            }
+          ]
         }
-      }
-    ]);
+      ]
+    });
 
-    const response = result.response.text();
+    const text = response.text;
 
     // Parse JSON from response
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
@@ -101,10 +108,14 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 }`;
 
   try {
-    const result = await geminiFlash.generateContent(prompt);
-    const response = result.response.text();
+    const response = await genAI.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt
+    });
 
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const text = response.text;
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
@@ -161,10 +172,14 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 }`;
 
   try {
-    const result = await geminiFlash.generateContent(prompt);
-    const response = result.response.text();
+    const response = await genAI.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt
+    });
 
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const text = response.text;
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
@@ -222,10 +237,14 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 }`;
 
   try {
-    const result = await geminiFlash.generateContent(prompt);
-    const response = result.response.text();
+    const response = await genAI.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt
+    });
 
-    const jsonMatch = response.match(/\{[\s\S]*\}/);
+    const text = response.text;
+
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
       return JSON.parse(jsonMatch[0]);
     }
