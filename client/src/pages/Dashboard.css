@@ -11,9 +11,10 @@
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 1rem 0;
-  background: rgba(10, 10, 15, 0.9);
+  padding: 0.5rem 0;
+  background: var(--glass-bg);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
 
@@ -40,13 +41,14 @@
   font-size: 0.875rem;
   font-weight: 500;
   border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
   cursor: pointer;
 }
 
 .nav-item:hover {
-  background: var(--bg-card);
+  background: var(--bg-hover);
   color: var(--primary);
+  transform: translateY(-1px);
 }
 
 /* Main */
@@ -56,30 +58,32 @@
 
 /* Welcome Section */
 .welcome-section {
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .welcome-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.375rem 0.75rem;
+  padding: 0.375rem 0.875rem;
   background: rgba(34, 197, 94, 0.1);
-  border: 1px solid rgba(34, 197, 94, 0.3);
+  border: 1px solid rgba(34, 197, 94, 0.2);
   border-radius: var(--radius-full);
   color: var(--primary);
   font-size: 0.75rem;
-  font-weight: 500;
-  margin-bottom: 1rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .welcome-section h1 {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
 /* Stats Section */
 .stats-section {
-  margin-bottom: 3rem;
+  margin-bottom: 3.5rem;
 }
 
 .stats-grid {
@@ -89,31 +93,24 @@
 }
 
 .stat-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  transition: all var(--transition-normal);
-}
-
-.stat-card:hover {
-  border-color: var(--border-light);
+  padding: 1.75rem;
 }
 
 .stat-header {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-  color: var(--text-muted);
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
   font-size: 0.875rem;
+  font-weight: 500;
 }
 
 /* Targets Card */
 .macro-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(2, 2fr);
+  gap: 1.25rem;
 }
 
 .macro-item {
@@ -122,8 +119,8 @@
 }
 
 .macro-value {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.625rem;
+  font-weight: 800;
   color: var(--primary);
 }
 
@@ -132,24 +129,24 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 /* Streak Card */
 .streak-card {
   text-decoration: none;
-  background: linear-gradient(135deg, var(--bg-card), rgba(245, 158, 11, 0.05));
+  background: linear-gradient(135deg, var(--bg-card), rgba(245, 158, 11, 0.08));
 }
 
 .streak-card:hover {
   border-color: var(--accent);
-  transform: translateY(-2px);
 }
 
 .streak-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 .streak-item {
@@ -158,41 +155,45 @@
 }
 
 .streak-value {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 2.25rem;
+  font-weight: 900;
   background: linear-gradient(135deg, var(--accent), var(--accent-pink));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .streak-label {
   font-size: 0.75rem;
   color: var(--text-muted);
+  font-weight: 500;
 }
 
 .streak-best {
   font-size: 0.875rem;
   color: var(--text-secondary);
+  font-style: italic;
 }
 
 /* Profile Card */
 .profile-info {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
 .profile-avatar {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   border-radius: 50%;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: white;
+  box-shadow: var(--shadow-md);
 }
 
 .profile-details {
@@ -201,7 +202,9 @@
 }
 
 .profile-name {
-  font-weight: 600;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .profile-goal {
@@ -211,11 +214,12 @@
   font-size: 0.875rem;
   color: var(--primary);
   text-transform: capitalize;
+  font-weight: 500;
 }
 
 /* Features Section */
 .features-section h2 {
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .feature-cards {
@@ -227,40 +231,20 @@
 .feature-card {
   display: flex;
   align-items: flex-start;
-  gap: 1rem;
-  padding: 1.5rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  gap: 1.25rem;
+  padding: 1.75rem;
   text-decoration: none;
-  transition: all var(--transition-normal);
-}
-
-.feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.feature-card.card-green:hover {
-  border-color: var(--primary);
-}
-
-.feature-card.card-purple:hover {
-  border-color: var(--secondary);
-}
-
-.feature-card.card-orange:hover {
-  border-color: var(--accent);
 }
 
 .feature-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
 }
 
 .card-green .feature-icon {
@@ -279,14 +263,16 @@
 }
 
 .feature-content h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.375rem;
+  color: var(--text-primary);
 }
 
 .feature-content p {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: var(--text-secondary);
+  line-height: 1.5;
 }
 
 /* Responsive */

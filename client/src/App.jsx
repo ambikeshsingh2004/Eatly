@@ -11,6 +11,7 @@ import GroceryPlanner from './pages/GroceryPlanner'
 import IngredientScanner from './pages/IngredientScanner'
 import RecipeFinder from './pages/RecipeFinder'
 import Streaks from './pages/Streaks'
+import Layout from './components/Layout'
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -65,24 +66,15 @@ function App() {
         } />
 
         {/* Protected Routes */}
-        <Route path="/onboarding" element={
-          <ProtectedRoute><Onboarding /></ProtectedRoute>
-        } />
-        <Route path="/dashboard" element={
-          <ProtectedRoute><Dashboard /></ProtectedRoute>
-        } />
-        <Route path="/grocery-planner" element={
-          <ProtectedRoute><GroceryPlanner /></ProtectedRoute>
-        } />
-        <Route path="/ingredient-scanner" element={
-          <ProtectedRoute><IngredientScanner /></ProtectedRoute>
-        } />
-        <Route path="/recipe-finder" element={
-          <ProtectedRoute><RecipeFinder /></ProtectedRoute>
-        } />
-        <Route path="/streaks" element={
-          <ProtectedRoute><Streaks /></ProtectedRoute>
-        } />
+        {/* Protected Routes */}
+        <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/grocery-planner" element={<GroceryPlanner />} />
+          <Route path="/ingredient-scanner" element={<IngredientScanner />} />
+          <Route path="/recipe-finder" element={<RecipeFinder />} />
+          <Route path="/streaks" element={<Streaks />} />
+        </Route>
 
         {/* 404 */}
         <Route path="*" element={<Navigate to="/" replace />} />

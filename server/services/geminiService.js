@@ -63,19 +63,28 @@ If no food items are detected, return: {"ingredients": [], "totalItems": 0}`;
   }
 };
 
-/**
- * Generate recipe suggestions from ingredients
- * @param {array} ingredients - List of available ingredients
- * @param {object} userProfile - User's diet preferences and goals
- * @returns {Promise<object>} Recipe suggestions
- */
+// Ask Gemini for some recipe ideas based on what we have.
+// We pass the user profile to make sure it respects their diet/goals.
 const generateRecipeSuggestions = async (ingredients, userProfile) => {
-  const { dietType, goal, dailyCalories } = userProfile;
+  const { dietType, goal, dailyCalories, weight, height, age, gender, activityLevel, exercisePreferences, language } = userProfile;
+
+  const lang = language || 'English';
+  const langInstruction = lang === 'English'
+    ? 'IMPORTANT: For common ingredients, providing the Indian/Hindi name in parentheses is helpful (e.g., "Salt (Namak)", "Clarified Butter (Ghee)").'
+    : `IMPORTANT: For all ingredient names and key terms, provide the ${lang} translation in parentheses. Example: "Salt (Translation)".`;
+
+  const userStats = `
+- User Stats: ${age} years, ${gender}, ${weight}kg, ${height}cm
+- Activity Level: ${activityLevel}
+- Max Cooking Time Preference: ${exercisePreferences?.maxTimeMinutes || 30} minutes
+- Preferred Language: ${lang}`;
 
   const prompt = `You are a professional nutritionist and chef. Given these available ingredients: ${ingredients.join(', ')}
 
 Create 3 healthy recipe suggestions for a ${dietType} person with a goal of ${goal}.
+${userStats}
 Target calories per meal: ${Math.round(dailyCalories / 3)} calories.
+${langInstruction}
 
 For each recipe provide:
 1. name: Recipe name
@@ -127,25 +136,40 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
   }
 };
 
-/**
- * Generate a meal plan with grocery list
- * @param {object} userProfile - User's complete profile
- * @param {number} days - Number of days (default 3)
- * @returns {Promise<object>} Meal plan and grocery list
- */
-const generateMealPlan = async (userProfile, days = 3) => {
-  const { dietType, goal, dailyCalories, dailyProtein, dailyCarbs, dailyFats } = userProfile;
+// This is the big one - generates a full meal plan + shopping list.
+// We try to nudge the AI to use common ingredients to save money/waste.
+const generateMealPlan = async (userProfile, days = 3, limit = 20, shoppingMode = 'economical') => {
+  const { dietType, goal, dailyCalories, dailyProtein, dailyCarbs, dailyFats, weight, height, age, gender, activityLevel, exercisePreferences, language } = userProfile;
+
+  const lang = language || 'English';
+  const langInstruction = lang === 'English'
+    ? 'Use Indian/Hindi names for common ingredients where appropriate (e.g., "Salt (Namak)") in descriptions and lists.'
+    : `Provide ${lang} translations for ingredients and meal names in parentheses.`;
+
+  const userStats = `
+- User Stats: ${age} years, ${gender}, ${weight}kg, ${height}cm
+- Activity Level: ${activityLevel}
+- Max Cooking Time Preference: ${exercisePreferences?.maxTimeMinutes || 30} minutes
+- Preferred Language: ${lang}`;
+
+  const modeInstruction = shoppingMode === 'premium'
+    ? "Exclude common budget items. Focus on HIGH QUALITY, organic, and premium ingredients. Suggest varied and gourmet recipes."
+    : "Focus on ECONOMICAL, budget-friendly ingredients. Suggest recipes that share common low-cost ingredients to minimize waste and cost.";
 
   const prompt = `You are a professional meal planning nutritionist. Create a ${days}-day meal plan for:
 - Diet type: ${dietType}
 - Goal: ${goal}
+${userStats}
 - Daily targets: ${dailyCalories} calories, ${dailyProtein}g protein, ${dailyCarbs}g carbs, ${dailyFats}g fats
+- Shopping Mode: ${shoppingMode.toUpperCase()} (${modeInstruction})
 
 Include for each day:
 - Breakfast, Lunch, Dinner, and 1-2 Snacks
 - Each meal should have name, brief description, and nutrition info
+- ${langInstruction}
 
 At the end, provide a complete grocery list organized by category.
+IMPORTANT: Consolidate ingredients and limit the TOTAL number of items in the grocery list to maximum ${limit}. Prioritize the most essential ingredients for the core meals.
 
 IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 {
@@ -191,14 +215,15 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
   }
 };
 
-/**
- * Get detailed recipe for a specific dish
- * @param {string} dishName - Name of the dish
- * @param {object} userProfile - User's diet preferences
- * @returns {Promise<object>} Detailed recipe
- */
+// Fetch the full details for a specific recipe.
+// We force the AI to give us structured JSON so the frontend doesn't explode.
 const getRecipeDetails = async (dishName, userProfile) => {
-  const { dietType } = userProfile;
+  const { dietType, language } = userProfile;
+
+  const lang = language || 'English';
+  const langInstruction = lang === 'English'
+    ? 'For the ingredient list: If the ingredient is "Salt", strictly put "Namak" in the "notes" field. For other common ingredients, you may add the Hindi name in notes if useful.'
+    : `For the ingredient list: Provide the ${lang} translation for the item in the "notes" field.`;
 
   const prompt = `You are a professional chef and nutritionist. Provide a detailed recipe for "${dishName}" suitable for a ${dietType} diet.
 
@@ -210,6 +235,8 @@ Include:
 5. Nutrition information per serving
 6. Tips for healthier variations
 7. Common mistakes to avoid
+
+${langInstruction}
 
 IMPORTANT: Return ONLY valid JSON in this exact format, no other text:
 {

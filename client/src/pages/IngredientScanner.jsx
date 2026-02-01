@@ -10,7 +10,9 @@ import {
   ChefHat,
   Clock,
   Flame,
-  Loader
+  Loader,
+  X,
+  Plus
 } from 'lucide-react';
 import './Feature.css';
 
@@ -20,6 +22,9 @@ const IngredientScanner = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
   const [ingredients, setIngredients] = useState(null);
+  const [editedIngredients, setEditedIngredients] = useState(null);
+  const [newIngredientName, setNewIngredientName] = useState('');
+  const [newIngredientQty, setNewIngredientQty] = useState('');
   const [recipes, setRecipes] = useState(null);
   const [error, setError] = useState('');
 
@@ -42,6 +47,7 @@ const IngredientScanner = () => {
     setAnalyzing(true);
     setError('');
     setIngredients(null);
+    setEditedIngredients(null);
     setRecipes(null);
 
     try {
@@ -55,6 +61,8 @@ const IngredientScanner = () => {
         
         if (response.success) {
           setIngredients(response.data.ingredients);
+          // Create a copy for editing
+          setEditedIngredients([...response.data.ingredients]);
         } else {
           setError(response.message || 'Failed to analyze image');
         }
@@ -68,13 +76,16 @@ const IngredientScanner = () => {
   };
 
   const handleGetRecipes = async () => {
-    if (!ingredients || ingredients.length === 0) return;
+    if (!editedIngredients || editedIngredients.length === 0) {
+      setError('Please add at least one ingredient');
+      return;
+    }
 
     setLoading(true);
     setError('');
 
     try {
-      const ingredientNames = ingredients.map(i => i.name);
+      const ingredientNames = editedIngredients.map(i => i.name);
       const response = await ingredientService.suggestRecipes(ingredientNames);
       
       if (response.success) {
@@ -89,33 +100,46 @@ const IngredientScanner = () => {
     }
   };
 
+  const removeIngredient = (index) => {
+    const updated = editedIngredients.filter((_, i) => i !== index);
+    setEditedIngredients(updated);
+  };
+
+  const addIngredient = () => {
+    if (!newIngredientName.trim()) {
+      setError('Please enter an ingredient name');
+      return;
+    }
+
+    const newIngredient = {
+      name: newIngredientName.trim(),
+      quantity: newIngredientQty.trim() || 'As needed'
+    };
+
+    setEditedIngredients([...editedIngredients, newIngredient]);
+    setNewIngredientName('');
+    setNewIngredientQty('');
+    setError('');
+  };
+
   const resetAll = () => {
     setImagePreview(null);
     setIngredients(null);
+    setEditedIngredients(null);
     setRecipes(null);
     setError('');
+    setNewIngredientName('');
+    setNewIngredientQty('');
   };
 
   return (
     <div className="feature-page">
-      {/* Header */}
-      <header className="feature-header">
-        <div className="container">
-          <Link to="/dashboard" className="back-btn">
-            <ArrowLeft size={20} />
-            <span>Back</span>
-          </Link>
-          <div className="logo">
-            <Sparkles size={24} />
-            <span>Eatly</span>
-          </div>
-        </div>
-      </header>
+
 
       <main className="feature-main">
         <div className="container">
           {/* Title */}
-          <section className="feature-title">
+          <section className="feature-title animate-fadeIn">
             <div className="feature-icon-lg purple">
               <Camera size={32} />
             </div>
@@ -127,7 +151,7 @@ const IngredientScanner = () => {
 
           {/* Upload Section */}
           {!imagePreview && (
-            <section className="upload-section card">
+            <section className="upload-section card card-premium animate-slideUp animate-delay-1">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -136,10 +160,10 @@ const IngredientScanner = () => {
                 style={{ display: 'none' }}
               />
               <div 
-                className="upload-area"
+                className="upload-area hover-lift"
                 onClick={() => fileInputRef.current.click()}
               >
-                <div className="upload-icon">
+                <div className="upload-icon animate-float">
                   <Upload size={48} />
                 </div>
                 <h3>Upload Image</h3>
@@ -151,45 +175,90 @@ const IngredientScanner = () => {
 
           {/* Image Preview */}
           {imagePreview && (
-            <section className="preview-section">
+            <section className="preview-section animate-scaleIn">
               <div className="image-preview card">
                 <img src={imagePreview} alt="Uploaded ingredients" />
                 {analyzing && (
-                  <div className="analyzing-overlay">
-                    <Loader size={32} className="spin" />
+                  <div className="analyzing-overlay backdrop-blur">
+                    <Loader size={32} className="animate-rotate" />
                     <span>Analyzing with AI...</span>
                   </div>
                 )}
               </div>
-              <button className="btn btn-ghost" onClick={resetAll}>
+              <button className="btn btn-ghost hover-scale" onClick={resetAll}>
                 Upload Different Image
               </button>
             </section>
           )}
 
-          {error && <p className="error-text center">{error}</p>}
+          {error && <p className="error-text center animate-wiggle">{error}</p>}
 
           {/* Detected Ingredients */}
-          {ingredients && ingredients.length > 0 && (
-            <section className="results-section">
-              <h2 className="heading-4">Detected Ingredients ({ingredients.length})</h2>
+          {editedIngredients && editedIngredients.length >= 0 && (
+            <section className="results-section animate-slideUp">
+              <div className="section-header">
+                <h2 className="heading-4">Your Ingredients ({editedIngredients.length})</h2>
+                <p className="text-muted" style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                  Remove incorrect items or add missing ingredients below
+                </p>
+              </div>
+              
               <div className="ingredients-grid">
-                {ingredients.map((ingredient, i) => (
-                  <div key={i} className="ingredient-tag">
+                {editedIngredients.map((ingredient, i) => (
+                  <div 
+                    key={i} 
+                    className={`ingredient-tag editable hover-lift animate-scaleIn animate-delay-${Math.min(i + 1, 5)}`}
+                  >
                     <span className="ingredient-name">{ingredient.name}</span>
                     <span className="ingredient-qty">{ingredient.quantity}</span>
+                    <button 
+                      className="remove-ingredient-btn"
+                      onClick={() => removeIngredient(i)}
+                      title="Remove ingredient"
+                    >
+                      <X size={14} />
+                    </button>
                   </div>
                 ))}
+              </div>
+
+              {/* Add Ingredient Form */}
+              <div className="add-ingredient-section card-glass animate-slideUp animate-delay-2">
+                <h3 className="heading-5" style={{ marginBottom: '1rem' }}>Add Ingredient</h3>
+                <div className="add-ingredient-form">
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Ingredient name (e.g., Tomato)"
+                    value={newIngredientName}
+                    onChange={(e) => setNewIngredientName(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
+                  />
+                  <input
+                    type="text"
+                    className="input"
+                    placeholder="Quantity (optional)"
+                    value={newIngredientQty}
+                    onChange={(e) => setNewIngredientQty(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addIngredient()}
+                  />
+                  <button 
+                    className="btn btn-secondary hover-scale"
+                    onClick={addIngredient}
+                  >
+                    <Plus size={18} /> Add
+                  </button>
+                </div>
               </div>
               
               {!recipes && (
                 <button 
-                  className="btn btn-primary btn-lg"
+                  className="btn btn-primary btn-lg hover-lift animate-glowPulse"
                   onClick={handleGetRecipes}
-                  disabled={loading}
+                  disabled={loading || editedIngredients.length === 0}
                 >
                   {loading ? (
-                    <><Loader size={20} className="spin" /> Getting Recipes...</>
+                    <><Loader size={20} className="animate-rotate" /> Getting Recipes...</>
                   ) : (
                     <><ChefHat size={20} /> Get Recipe Suggestions</>
                   )}
@@ -200,14 +269,17 @@ const IngredientScanner = () => {
 
           {/* Recipe Suggestions */}
           {recipes && recipes.length > 0 && (
-            <section className="results-section">
+            <section className="results-section animate-fadeIn">
               <h2 className="heading-4">Recipe Suggestions</h2>
               <div className="recipes-list">
                 {recipes.map((recipe, i) => (
-                  <div key={i} className="recipe-card card">
+                  <div 
+                    key={i} 
+                    className={`recipe-card card card-premium hover-lift animate-slideUp animate-delay-${Math.min(i + 1, 5)}`}
+                  >
                     <div className="recipe-header">
                       <h3>{recipe.name}</h3>
-                      <span className="recipe-difficulty">{recipe.difficulty}</span>
+                      <span className="recipe-difficulty badge badge-primary">{recipe.difficulty}</span>
                     </div>
                     <p className="recipe-description">{recipe.description}</p>
                     <div className="recipe-meta">
@@ -232,6 +304,9 @@ const IngredientScanner = () => {
                   </div>
                 ))}
               </div>
+              <button className="btn btn-ghost hover-scale" onClick={resetAll}>
+                Start Over
+              </button>
             </section>
           )}
         </div>

@@ -49,7 +49,10 @@ export const AuthProvider = ({ children }) => {
     const response = await authService.login(email, password);
     if (response.success) {
       setUser(response.data.user);
-      // Fetch full profile
+      // Set initial profile data from login response
+      setProfile({ user: response.data.user });
+      
+      // Fetch full profile in background
       try {
         const profileRes = await profileService.getProfile();
         if (profileRes.success) {
@@ -88,7 +91,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     refreshProfile,
-    isOnboarded: profile?.profile?.onboardingComplete || false
+    isOnboarded: profile?.profile?.onboardingComplete || profile?.user?.onboardingComplete || user?.onboardingComplete || false
   };
 
   return (

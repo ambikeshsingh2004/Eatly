@@ -49,19 +49,7 @@ const RecipeFinder = () => {
 
   return (
     <div className="feature-page">
-      {/* Header */}
-      <header className="feature-header">
-        <div className="container">
-          <Link to="/dashboard" className="back-btn">
-            <ArrowLeft size={20} />
-            <span>Back</span>
-          </Link>
-          <div className="logo">
-            <Sparkles size={24} />
-            <span>Eatly</span>
-          </div>
-        </div>
-      </header>
+
 
       <main className="feature-main">
         <div className="container">

@@ -64,28 +64,28 @@ const Landing = () => {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">
+            <div className="hero-badge animate-pulse">
               <Zap size={14} />
               <span>Powered by AI</span>
             </div>
-            <h1 className="heading-1">
+            <h1 className="heading-1 animate-fadeIn">
               Your Personal
               <span className="text-gradient"> AI Nutritionist</span>
             </h1>
-            <p className="hero-description">
+            <p className="hero-description animate-slideUp animate-delay-1">
               Transform your health journey with smart meal planning, 
               ingredient recognition, and personalized nutrition tracking.
               All powered by cutting-edge AI.
             </p>
-            <div className="hero-cta">
-              <Link to="/signup" className="btn btn-primary btn-lg">
+            <div className="hero-cta animate-slideUp animate-delay-2">
+              <Link to="/signup" className="btn btn-primary btn-lg hover-lift">
                 Start Free <ArrowRight size={20} />
               </Link>
-              <Link to="/login" className="btn btn-secondary btn-lg">
+              <Link to="/login" className="btn btn-secondary btn-lg hover-scale">
                 I have an account
               </Link>
             </div>
-            <div className="hero-stats">
+            <div className="hero-stats animate-fadeIn animate-delay-3">
               <div className="stat">
                 <span className="stat-value">100+</span>
                 <span className="stat-label">Recipes</span>
@@ -102,8 +102,8 @@ const Landing = () => {
               </div>
             </div>
           </div>
-          <div className="hero-visual">
-            <div className="hero-card">
+          <div className="hero-visual animate-scaleIn animate-delay-2">
+            <div className="hero-card card-glass hover-lift">
               <div className="hero-card-glow"></div>
               <div className="hero-card-content">
                 <div className="mock-header">
@@ -151,7 +151,7 @@ const Landing = () => {
       {/* Features Section */}
       <section className="features">
         <div className="container">
-          <div className="section-header">
+          <div className="section-header animate-fadeIn">
             <h2 className="heading-2">
               Everything you need for
               <span className="text-gradient"> healthy eating</span>
@@ -162,8 +162,7 @@ const Landing = () => {
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className="feature-card card card-interactive"
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className={`feature-card card card-premium hover-lift animate-scaleIn animate-delay-${index + 1}`}
               >
                 <div className="feature-icon">{feature.icon}</div>
                 <h3 className="heading-4">{feature.title}</h3>

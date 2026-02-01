@@ -8,7 +8,7 @@ const geminiService = require('../services/geminiService');
 const getMealPlan = async (req, res, next) => {
   try {
     const { user } = req;
-    const { days = 3 } = req.query;
+    const { days = 3, limit = 20, mode = 'economical' } = req.query;
 
     // Get user profile
     const { data: profile } = await supabase
@@ -30,10 +30,17 @@ const getMealPlan = async (req, res, next) => {
       dailyCalories: profile.daily_calories,
       dailyProtein: profile.daily_protein,
       dailyCarbs: profile.daily_carbs,
-      dailyFats: profile.daily_fats
+      dailyFats: profile.daily_fats,
+      weight: profile.weight,
+      height: profile.height,
+      age: profile.age,
+      gender: profile.gender,
+      activityLevel: profile.activity_level,
+      exercisePreferences: profile.exercise_preferences,
+      language: profile.language || 'English'
     };
 
-    const result = await geminiService.generateMealPlan(userProfile, parseInt(days));
+    const result = await geminiService.generateMealPlan(userProfile, parseInt(days), parseInt(limit), mode);
 
     res.json({
       success: true,

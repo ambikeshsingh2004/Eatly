@@ -17,6 +17,7 @@ const completeOnboarding = async (req, res, next) => {
       dietType,
       goal,
       activityLevel,
+      language,
       exercisePreferences
     } = req.body;
 
@@ -46,6 +47,7 @@ const completeOnboarding = async (req, res, next) => {
         daily_protein: targets.dailyProtein,
         daily_carbs: targets.dailyCarbs,
         daily_fats: targets.dailyFats,
+        language: language || 'English',
         onboarding_complete: true,
         updated_at: new Date().toISOString()
       })
@@ -162,6 +164,7 @@ const getProfile = async (req, res, next) => {
           dailyProtein: profile.daily_protein,
           dailyCarbs: profile.daily_carbs,
           dailyFats: profile.daily_fats,
+          language: profile.language || 'English',
           onboardingComplete: profile.onboarding_complete,
           createdAt: profile.created_at
         },
@@ -201,7 +204,9 @@ const updateProfile = async (req, res, next) => {
       height: 'height',
       dietType: 'diet_type',
       goal: 'goal',
-      activityLevel: 'activity_level'
+      goal: 'goal',
+      activityLevel: 'activity_level',
+      language: 'language'
     };
 
     for (const [key, value] of Object.entries(updates)) {

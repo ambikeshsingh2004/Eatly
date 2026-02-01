@@ -105,7 +105,8 @@ const login = async (req, res, next) => {
         user: {
           id: data.user.id,
           email: data.user.email,
-          fullName: profile?.full_name || ''
+          fullName: profile?.full_name || '',
+          onboardingComplete: profile?.onboarding_complete || false
         },
         session: {
           accessToken: data.session.access_token,

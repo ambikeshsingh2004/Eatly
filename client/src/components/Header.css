@@ -1,0 +1,92 @@
+/* ========================================
+   SHARED HEADER STYLES
+======================================== */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
+  background: rgba(10, 10, 15, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-normal);
+}
+
+/* Light theme header */
+[data-theme="light"] .app-header {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.app-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-nav .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.header-nav .nav-item:hover {
+  background: var(--bg-card);
+  color: var(--primary);
+}
+
+/* Theme Toggle Button */
+.header-nav .theme-toggle {
+  padding: 0.625rem;
+  color: var(--accent);
+}
+
+.header-nav .theme-toggle:hover {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--accent);
+}
+
+.header-nav .logout-btn {
+  color: var(--text-muted);
+}
+
+.header-nav .logout-btn:hover {
+  color: var(--error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-nav .nav-item span {
+    display: none;
+  }
+
+  .header-nav .nav-item {
+    padding: 0.625rem;
+  }
+}

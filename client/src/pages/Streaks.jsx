@@ -106,7 +106,7 @@ const Streaks = () => {
     }
   };
 
-  const userProfile = profile?.profile;
+  const userProfile = profile?.user || profile?.profile;
 
   if (loading) {
     return (
@@ -118,19 +118,7 @@ const Streaks = () => {
 
   return (
     <div className="feature-page">
-      {/* Header */}
-      <header className="feature-header">
-        <div className="container">
-          <Link to="/dashboard" className="back-btn">
-            <ArrowLeft size={20} />
-            <span>Back</span>
-          </Link>
-          <div className="logo">
-            <Sparkles size={24} />
-            <span>Eatly</span>
-          </div>
-        </div>
-      </header>
+
 
       <main className="feature-main">
         <div className="container">
@@ -147,11 +135,14 @@ const Streaks = () => {
 
           {/* Streak Cards */}
           <section className="streaks-grid">
-            {/* Calorie Streak */}
-            <div className="streak-stat-card card">
+              {/* Calorie Streak */}
+            <div className={`streak-stat-card card ${streaks?.lastCalorieLog === new Date().toISOString().split('T')[0] ? 'complete' : ''}`}>
               <div className="streak-stat-header">
                 <Utensils size={24} />
                 <span>Calorie Streak</span>
+                {streaks?.lastCalorieLog === new Date().toISOString().split('T')[0] && (
+                  <span className="status-badge"><Check size={12} /> Done</span>
+                )}
               </div>
               <div className="streak-stat-value">
                 <span className="streak-number">{streaks?.calorieStreak || 0}</span>
@@ -161,19 +152,24 @@ const Streaks = () => {
                 <Trophy size={16} />
                 Best: {streaks?.calorieBestStreak || 0} days
               </div>
-              <button 
-                className="btn btn-primary"
-                onClick={() => setShowCalorieForm(true)}
-              >
-                <Plus size={18} /> Log Today
-              </button>
+              {streaks?.lastCalorieLog !== new Date().toISOString().split('T')[0] && (
+                <button 
+                  className="btn btn-primary"
+                  onClick={() => setShowCalorieForm(true)}
+                >
+                  <Plus size={18} /> Log Today
+                </button>
+              )}
             </div>
 
             {/* Exercise Streak */}
-            <div className="streak-stat-card card">
+            <div className={`streak-stat-card card ${streaks?.lastExerciseLog === new Date().toISOString().split('T')[0] ? 'complete' : ''}`}>
               <div className="streak-stat-header">
                 <Dumbbell size={24} />
                 <span>Exercise Streak</span>
+                {streaks?.lastExerciseLog === new Date().toISOString().split('T')[0] && (
+                  <span className="status-badge"><Check size={12} /> Done</span>
+                )}
               </div>
               <div className="streak-stat-value">
                 <span className="streak-number exercise">{streaks?.exerciseStreak || 0}</span>
@@ -183,39 +179,40 @@ const Streaks = () => {
                 <Trophy size={16} />
                 Best: {streaks?.exerciseBestStreak || 0} days
               </div>
-              <button 
-                className="btn btn-secondary"
-                onClick={() => setShowExerciseForm(true)}
-              >
-                <Plus size={18} /> Log Today
-              </button>
+              {streaks?.lastExerciseLog !== new Date().toISOString().split('T')[0] && (
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => setShowExerciseForm(true)}
+                >
+                  <Plus size={18} /> Log Today
+                </button>
+              )}
             </div>
           </section>
 
           {/* Daily Targets Info */}
-          {userProfile && (
-            <section className="targets-info card">
-              <h4>Your Daily Targets</h4>
-              <div className="targets-grid">
-                <div className="target-item">
-                  <span className="target-value">{userProfile.dailyCalories}</span>
-                  <span className="target-label">Calories</span>
-                </div>
-                <div className="target-item">
-                  <span className="target-value">{userProfile.dailyProtein}g</span>
-                  <span className="target-label">Protein</span>
-                </div>
-                <div className="target-item">
-                  <span className="target-value">{userProfile.dailyCarbs}g</span>
-                  <span className="target-label">Carbs</span>
-                </div>
-                <div className="target-item">
-                  <span className="target-value">{userProfile.dailyFats}g</span>
-                  <span className="target-label">Fats</span>
-                </div>
+          <section className="targets-info card">
+            <h4>🎯 Your Daily Targets</h4>
+            <div className="targets-grid">
+              <div className="target-item">
+                <span className="target-value">{userProfile?.dailyCalories || profile?.user?.dailyCalories || 2000}</span>
+                <span className="target-label">Calories</span>
               </div>
-            </section>
-          )}
+              <div className="target-item">
+                <span className="target-value">{userProfile?.dailyProtein || profile?.user?.dailyProtein || 150}g</span>
+                <span className="target-label">Protein</span>
+              </div>
+              <div className="target-item">
+                <span className="target-value">{userProfile?.dailyCarbs || profile?.user?.dailyCarbs || 200}g</span>
+                <span className="target-label">Carbs</span>
+              </div>
+              <div className="target-item">
+                <span className="target-value">{userProfile?.dailyFats || profile?.user?.dailyFats || 65}g</span>
+                <span className="target-label">Fats</span>
+              </div>
+            </div>
+            <p className="targets-hint">Hit your calorie target (±10%) daily to maintain your streak!</p>
+          </section>
 
           {/* History */}
           {history && (history.calorieHistory?.length > 0 || history.exerciseHistory?.length > 0) && (
@@ -255,6 +252,9 @@ const Streaks = () => {
         <div className="modal-overlay" onClick={() => setShowCalorieForm(false)}>
           <div className="modal card" onClick={(e) => e.stopPropagation()}>
             <h3>Log Calorie Intake</h3>
+            <p className="modal-hint">
+              💡 Values within ±10% of your target ({Math.round((userProfile?.dailyCalories || 2000) * 0.9)} - {Math.round((userProfile?.dailyCalories || 2000) * 1.1)}) will count towards your streak!
+            </p>
             <form onSubmit={handleLogCalories}>
               <div className="input-group">
                 <label>Calories Consumed *</label>

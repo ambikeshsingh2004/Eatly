@@ -97,11 +97,32 @@ const updateCalorieStreak = async (userId, metGoal) => {
   const streakAction = calculateStreakAction(streakData.last_calorie_log);
   let newStreak = streakData.calorie_streak;
 
+  // If already logged today, recalculate based on new goal status
   if (streakAction.action === 'already_logged') {
+    // Recalculate streak based on whether goal is now met
+    if (metGoal) {
+      // If goal is now met and streak was 0, set it to 1
+      newStreak = Math.max(streakData.calorie_streak, 1);
+    } else {
+      newStreak = 0;
+    }
+
+    const newBestStreak = Math.max(newStreak, streakData.calorie_best_streak);
+
+    // Update the streak in database
+    await supabase
+      .from('streaks')
+      .update({
+        calorie_streak: newStreak,
+        calorie_best_streak: newBestStreak,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+
     return {
       currentStreak: newStreak,
-      bestStreak: streakData.calorie_best_streak,
-      action: 'already_logged_today'
+      bestStreak: newBestStreak,
+      action: 'updated_today'
     };
   }
 

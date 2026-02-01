@@ -20,12 +20,13 @@ const getRecipe = async (req, res, next) => {
     // Get user profile for dietary preferences
     const { data: profile } = await supabase
       .from('profiles')
-      .select('diet_type')
+      .select('diet_type, language')
       .eq('id', user.id)
       .single();
 
     const userProfile = {
-      dietType: profile?.diet_type || 'non-vegetarian'
+      dietType: profile?.diet_type || 'non-vegetarian',
+      language: profile?.language || 'English'
     };
 
     const result = await geminiService.getRecipeDetails(dishName.trim(), userProfile);

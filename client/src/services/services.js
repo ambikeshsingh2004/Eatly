@@ -73,8 +73,8 @@ export const ingredientService = {
 
 // ==================== GROCERY ====================
 export const groceryService = {
-  getMealPlan: async (days = 3) => {
-    const response = await api.get(`/grocery/meal-plan?days=${days}`);
+  getMealPlan: async (days = 3, ingredientLimit = 20, shoppingMode = 'economical') => {
+    const response = await api.get(`/grocery/meal-plan?days=${days}&limit=${ingredientLimit}&mode=${shoppingMode}`);
     return response.data;
   }
 };

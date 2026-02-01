@@ -18,19 +18,22 @@ import './Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, profile, logout, isOnboarded } = useAuth();
+  const { user, profile, logout, isOnboarded, loading: authLoading } = useAuth();
   const [streaks, setStreaks] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking onboarding
+    if (authLoading) return;
+    
     // Redirect to onboarding if not completed
-    if (!isOnboarded) {
+    if (!isOnboarded && user) {
       navigate('/onboarding');
       return;
     }
     
     fetchStreaks();
-  }, [isOnboarded, navigate]);
+  }, [isOnboarded, navigate, authLoading, user]);
 
   const fetchStreaks = async () => {
     try {
@@ -45,10 +48,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
+
 
   const features = [
     {
@@ -74,7 +74,7 @@ const Dashboard = () => {
     }
   ];
 
-  const userProfile = profile?.profile;
+  const userProfile = profile?.user || profile?.profile;
   const macros = userProfile ? {
     calories: userProfile.dailyCalories,
     protein: userProfile.dailyProtein,
@@ -92,33 +92,12 @@ const Dashboard = () => {
 
   return (
     <div className="dashboard">
-      {/* Header */}
-      <header className="dashboard-header">
-        <div className="container">
-          <Link to="/dashboard" className="logo">
-            <Sparkles size={24} />
-            <span>Eatly</span>
-          </Link>
-          <nav className="dashboard-nav">
-            <Link to="/streaks" className="nav-item">
-              <Flame size={20} />
-              <span>Streaks</span>
-            </Link>
-            <button className="nav-item" onClick={handleLogout}>
-              <LogOut size={20} />
-              <span>Logout</span>
-            </button>
-          </nav>
-        </div>
-      </header>
-
-      {/* Main Content */}
       <main className="dashboard-main">
         <div className="container">
           {/* Welcome Section */}
-          <section className="welcome-section">
+          <section className="welcome-section animate-fadeIn">
             <div className="welcome-content">
-              <div className="welcome-badge">
+              <div className="welcome-badge animate-pulse">
                 <Zap size={14} />
                 <span>AI-Powered</span>
               </div>
@@ -132,7 +111,7 @@ const Dashboard = () => {
           </section>
 
           {/* Quick Stats */}
-          <section className="stats-section">
+          <section className="stats-section animate-slideUp animate-delay-1">
             <div className="stats-grid">
               {/* Daily Targets Card */}
               <div className="stat-card targets-card">
@@ -140,26 +119,24 @@ const Dashboard = () => {
                   <Target size={20} />
                   <span>Daily Targets</span>
                 </div>
-                {macros && (
-                  <div className="macro-grid">
-                    <div className="macro-item">
-                      <span className="macro-value">{macros.calories}</span>
-                      <span className="macro-label">Calories</span>
-                    </div>
-                    <div className="macro-item">
-                      <span className="macro-value">{macros.protein}g</span>
-                      <span className="macro-label">Protein</span>
-                    </div>
-                    <div className="macro-item">
-                      <span className="macro-value">{macros.carbs}g</span>
-                      <span className="macro-label">Carbs</span>
-                    </div>
-                    <div className="macro-item">
-                      <span className="macro-value">{macros.fats}g</span>
-                      <span className="macro-label">Fats</span>
-                    </div>
+                <div className="macro-grid">
+                  <div className="macro-item">
+                    <span className="macro-value">{userProfile?.dailyCalories || profile?.user?.dailyCalories || 2000}</span>
+                    <span className="macro-label">Calories</span>
                   </div>
-                )}
+                  <div className="macro-item">
+                    <span className="macro-value">{userProfile?.dailyProtein || profile?.user?.dailyProtein || 150}g</span>
+                    <span className="macro-label">Protein</span>
+                  </div>
+                  <div className="macro-item">
+                    <span className="macro-value">{userProfile?.dailyCarbs || profile?.user?.dailyCarbs || 200}g</span>
+                    <span className="macro-label">Carbs</span>
+                  </div>
+                  <div className="macro-item">
+                    <span className="macro-value">{userProfile?.dailyFats || profile?.user?.dailyFats || 65}g</span>
+                    <span className="macro-label">Fats</span>
+                  </div>
+                </div>
               </div>
 
               {/* Streaks Card */}
@@ -206,14 +183,14 @@ const Dashboard = () => {
           </section>
 
           {/* Features Section */}
-          <section className="features-section">
+          <section className="features-section animate-slideUp animate-delay-2">
             <h2 className="heading-4">What would you like to do?</h2>
             <div className="feature-cards">
               {features.map((feature, index) => (
                 <Link 
                   key={index} 
                   to={feature.link} 
-                  className={`feature-card card-${feature.color}`}
+                  className={`feature-card card-${feature.color} card-premium hover-lift animate-scaleIn animate-delay-${index + 1}`}
                 >
                   <div className="feature-icon">{feature.icon}</div>
                   <div className="feature-content">

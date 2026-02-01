@@ -1,10 +1,9 @@
 const supabase = require('../config/supabase');
 const geminiService = require('../services/geminiService');
 
-/**
- * Analyze Image for Ingredients
- * Detects ingredients from uploaded image
- */
+// --- Image Analysis Endpoint ---
+// This takes a photo (Base64), cleans it up, and asks Gemini to find ingredients in it.
+// Think of it as "Shazam for Food".
 const analyzeImage = async (req, res, next) => {
   try {
     const { image, mimeType } = req.body;
@@ -32,10 +31,9 @@ const analyzeImage = async (req, res, next) => {
   }
 };
 
-/**
- * Suggest Recipes from Ingredients
- * Generates recipe suggestions based on available ingredients
- */
+// --- Recipe Suggestion Endpoint ---
+// Now that we have a list of ingredients, we ask Gemini to cook something up!
+// We ALSO grab the user's profile so we don't suggest steak to a vegetarian.
 const suggestRecipes = async (req, res, next) => {
   try {
     const { user } = req;
@@ -51,7 +49,7 @@ const suggestRecipes = async (req, res, next) => {
     // Get user profile for dietary preferences
     const { data: profile } = await supabase
       .from('profiles')
-      .select('diet_type, goal, daily_calories')
+      .select('*')
       .eq('id', user.id)
       .single();
 
@@ -65,7 +63,14 @@ const suggestRecipes = async (req, res, next) => {
     const userProfile = {
       dietType: profile.diet_type || 'non-vegetarian',
       goal: profile.goal || 'maintain',
-      dailyCalories: profile.daily_calories || 2000
+      dailyCalories: profile.daily_calories || 2000,
+      weight: profile.weight,
+      height: profile.height,
+      age: profile.age,
+      gender: profile.gender,
+      activityLevel: profile.activity_level,
+      exercisePreferences: profile.exercise_preferences,
+      language: profile.language || 'English'
     };
 
     const result = await geminiService.generateRecipeSuggestions(ingredients, userProfile);

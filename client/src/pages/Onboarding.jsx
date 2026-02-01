@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { profileService } from '../services/services';
@@ -20,6 +20,13 @@ const Onboarding = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Scroll to top when step changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [step]);
+
+  // This is where we store all the user's details before sending to the backend.
+  // We need this data to make the AI smart (e.g. giving fewer calories if weight loss is the goal).
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     age: '',
@@ -28,6 +35,7 @@ const Onboarding = () => {
     height: '',
     dietType: '',
     goal: '',
+    language: 'English',
     activityLevel: '',
     exercisePreferences: {
       canGoGym: false,
@@ -124,7 +132,10 @@ const Onboarding = () => {
 
         {/* Step Content */}
         <div className="onboarding-card">
-          {/* Step 1: Basic Info */}
+          {/* 
+            Step 1: The Basics 
+            Age, Weight, Height are crucial for calculating BMR (Basal Metabolic Rate).
+          */}
           {step === 1 && (
             <div className="step-content animate-slideUp">
               <div className="step-icon">
@@ -201,10 +212,29 @@ const Onboarding = () => {
                   ))}
                 </div>
               </div>
+
+              <div className="input-group">
+                <label>Preferred Language</label>
+                <div className="option-grid">
+                  {['English', 'Hindi', 'Chinese', 'Japanese'].map((lang) => (
+                    <button
+                      key={lang}
+                      type="button"
+                      className={`option-btn ${formData.language === lang ? 'selected' : ''}`}
+                      onClick={() => selectOption('language', lang)}
+                    >
+                      {lang}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Step 2: Diet & Goals */}
+          {/* 
+            Step 2: Goals & Diet 
+            This tells the AI what kind of food to suggest (e.g. High Protein for Muscle Gain).
+          */}
           {step === 2 && (
             <div className="step-content animate-slideUp">
               <div className="step-icon">
@@ -281,7 +311,10 @@ const Onboarding = () => {
             </div>
           )}
 
-          {/* Step 3: Exercise Preferences */}
+          {/* 
+            Step 3: Sweat Equity 
+            We ask what equipment they have so we don't suggest Swimming if they have no pool!
+          */}
           {step === 3 && (
             <div className="step-content animate-slideUp">
               <div className="step-icon">
@@ -340,7 +373,10 @@ const Onboarding = () => {
             </div>
           )}
 
-          {/* Step 4: Review */}
+          {/* 
+            Step 4: The Final check 
+            Show them what they picked before we save it to the database.
+          */}
           {step === 4 && (
             <div className="step-content animate-slideUp">
               <div className="step-icon success">

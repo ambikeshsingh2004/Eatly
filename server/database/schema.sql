@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   daily_protein INTEGER,
   daily_carbs INTEGER,
   daily_fats INTEGER,
+  language TEXT DEFAULT 'English',
   onboarding_complete BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
