@@ -38,6 +38,7 @@ app.use(cors({
 
     // ✅ FINAL FIX: allow Vercel + exact matches
     if (
+      // Allow Vercel deployments (prod + preview)
       allowedOrigins.includes(normalizedOrigin) ||
       normalizedOrigin.endsWith(".vercel.app")
     ) {
