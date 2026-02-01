@@ -18,37 +18,50 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Security middleware
+// ==================== Security Middleware ====================
 app.use(helmet());
 
-// CORS configuration
+// ==================== CORS Configuration ====================
 const allowedOrigins = [
   "http://localhost:5173",
   process.env.CLIENT_URL
-].filter(Boolean);
+]
+  .filter(Boolean)
+  .map(o => o.replace(/\/$/, "")); // normalize trailing slash
 
 app.use(cors({
   origin: function (origin, callback) {
-    // allow requests with no origin (Postman, curl)
+    // Allow non-browser requests (Postman, curl, health checks)
     if (!origin) return callback(null, true);
 
-    if (allowedOrigins.includes(origin)) {
+    const normalizedOrigin = origin.replace(/\/$/, "");
+
+    if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
 
+    console.error("❌ CORS blocked:", origin);
     return callback(new Error("Not allowed by CORS"));
   },
-  credentials: true
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// Logging middleware
+// Handle preflight requests
+app.options('*', cors());
+
+// Log allowed origins once at startup
+console.log("✅ Allowed CORS Origins:", allowedOrigins);
+
+// ==================== Logging ====================
 app.use(morgan('dev'));
 
-// Body parsing middleware
-app.use(express.json({ limit: '10mb' })); // Increased for image uploads
+// ==================== Body Parsing ====================
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Health check endpoint
+// ==================== Health Check ====================
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -59,67 +72,34 @@ app.get('/api/health', (req, res) => {
 });
 
 // ==================== API Routes ====================
-
-// Auth Routes - Signup, Login, Logout
 app.use('/api/auth', authRoutes);
-
-// Profile Routes - Onboarding, Profile CRUD, Macros
 app.use('/api/profile', profileRoutes);
-
-// Feature 1: Ingredient Analysis Routes
-// - Analyze image for ingredients
-// - Get recipe suggestions from ingredients
 app.use('/api/ingredients', ingredientRoutes);
-
-// Feature 2: Grocery Planning Routes
-// - Generate meal plan with grocery list
 app.use('/api/grocery', groceryRoutes);
-
-// Feature 3: Recipe Routes
-// - Get detailed recipe for a dish
 app.use('/api/recipes', recipeRoutes);
-
-// Streak Tracking Routes
-// - Log calories, Log exercise
-// - Get streaks, Get history
 app.use('/api/streaks', streakRoutes);
 
-// ==================== Error Handling ====================
-
-// 404 handler
-app.use((req, res, next) => {
+// ==================== 404 Handler ====================
+app.use((req, res) => {
   res.status(404).json({
     success: false,
     message: `Route ${req.originalUrl} not found`
   });
 });
 
-// Global error handler
+// ==================== Global Error Handler ====================
 app.use(errorHandler);
 
 // ==================== Start Server ====================
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log('='.repeat(50));
-  console.log(`🚀 Eatly API Server`);
+  console.log('🚀 Eatly API Server');
   console.log('='.repeat(50));
   console.log(`📍 Port: ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Health Check: http://localhost:${PORT}/api/health`);
-  console.log('='.repeat(50));
-  console.log('Available Routes:');
-  console.log('  POST /api/auth/signup');
-  console.log('  POST /api/auth/login');
-  console.log('  POST /api/profile/onboarding');
-  console.log('  POST /api/ingredients/analyze');
-  console.log('  POST /api/ingredients/suggest-recipes');
-  console.log('  GET  /api/grocery/meal-plan');
-  console.log('  POST /api/recipes/get');
-  console.log('  POST /api/streaks/calorie-log');
-  console.log('  POST /api/streaks/exercise-log');
-  console.log('  GET  /api/streaks');
   console.log('='.repeat(50));
 });
 
