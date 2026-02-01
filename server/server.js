@@ -27,7 +27,7 @@ const allowedOrigins = [
   process.env.CLIENT_URL
 ]
   .filter(Boolean)
-  .map(o => o.replace(/\/$/, "")); // normalize trailing slash
+  .map(o => o.replace(/\/$/, ""));
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -36,7 +36,11 @@ app.use(cors({
 
     const normalizedOrigin = origin.replace(/\/$/, "");
 
-    if (allowedOrigins.includes(normalizedOrigin)) {
+    // ✅ FINAL FIX: allow Vercel + exact matches
+    if (
+      allowedOrigins.includes(normalizedOrigin) ||
+      normalizedOrigin.endsWith(".vercel.app")
+    ) {
       return callback(null, true);
     }
 
