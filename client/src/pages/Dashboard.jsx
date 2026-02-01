@@ -140,7 +140,11 @@ const Dashboard = () => {
               </div>
 
               {/* Streaks Card */}
-              <Link to="/streaks" className="stat-card streak-card">
+              <div 
+                className="stat-card streak-card" 
+                onClick={() => navigate('/streaks')}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="stat-header">
                   <Flame size={20} />
                   <span>Your Streaks</span>
@@ -158,7 +162,7 @@ const Dashboard = () => {
                 <div className="streak-best">
                   🏆 Best: {Math.max(streaks?.calorieBestStreak || 0, streaks?.exerciseBestStreak || 0)} days
                 </div>
-              </Link>
+              </div>
 
               {/* Profile Card */}
               <div className="stat-card profile-card">

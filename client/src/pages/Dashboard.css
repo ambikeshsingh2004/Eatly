@@ -94,6 +94,21 @@
 
 .stat-card {
   padding: 1.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  /* Fix for Link/Anchor tags shrinking */
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary);
 }
 
 .stat-header {
@@ -287,5 +302,25 @@
 @media (max-width: 768px) {
   .nav-item span {
     display: none;
+  }
+
+  /* Make Daily Targets cleaner on mobile */
+  .macro-grid {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .macro-item {
+    align-items: center;
+    text-align: center;
+  }
+
+  .macro-value {
+    font-size: 1.25rem;
+  }
+
+  .macro-label {
+    font-size: 0.7rem;
   }
 }
