@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS profiles (
   email TEXT NOT NULL,
   full_name TEXT,
   age INTEGER,
-  gender TEXT CHECK (gender IN ('male', 'female', 'other')),
+  gender TEXT CHECK (gender IN ('male', 'female', 'othe')),
   weight DECIMAL(5,2),
   height DECIMAL(5,2),
   diet_type TEXT CHECK (diet_type IN ('vegetarian', 'non-vegetarian', 'vegan', 'eggetarian')),
